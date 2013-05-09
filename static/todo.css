@@ -1,0 +1,22 @@
+body {
+	font: 14px/1.4em "Helvetica Neue",Helvetica,Arial,sans-serif;
+    background: none repeat scroll 0% 0% rgb(238, 238, 238);
+}
+.container { background: white; padding: 20px; }
+.todo-item { font-size:24px; font-weight:bold; }
+.numLeft { font-weight:bold; }
+.done { text-decoration:line-through; }
+.footer { padding: 4px; background: none repeat scroll 0% 0% rgb(244, 252, 232); }
+
+input[type="text"] {
+	width: 466px;
+	height:50px;
+    font-size: 24px;
+    font-family: inherit;
+    line-height: 1.4em;
+	outline: medium none;
+    padding: 6px;
+    border: 1px solid rgb(153, 153, 153);
+    box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.2) inset;
+}
+								
