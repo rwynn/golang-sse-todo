@@ -1,32 +1,42 @@
-golang-sse-todo
+golang server send events (sse) todo example
 ===============
+This example was inspired by code at https://github.com/kljensen/golang-html5-sse-example. 
+It uses knockout.js and foundation for the UI. The UX is heavily inspired by http://backbonejs.org/docs/todos.html.
 
-golang server send events (sse) example
+### Up and Running ###
 
-This example was inspired by code at https://github.com/kljensen/golang-html5-sse-example and uses 
-knockout.js and foundation for the UI.
-
-### Getting Started ###
-
+#### Install Dependencies ####
 Install git and the go runtime
 
 	sudo apt-get install git golang
+
+Install mongodb.  Packages and instructions for multiple OSes available at http://www.mongodb.org/downloads 
+
+Install mgo, the mongodb driver for golang
+
+	sudo go get labix.org/v2/mgo
 
 Clone this repository to your local filesystem
 
 	git clone https://github.com/rwynn/golang-sse-todo.git
 
+#### Start the Servers ####
+Start the mongo server if it's not already running
+
+	sudo mongod -f /etc/mongodb.conf
+
 Run the server
 
-	cd golang-sse-todo
+	export GOPATH=/path/to/golang-sse-todo
+	cd $GOPATH 
 	go run todo.go
 
+#### Create some Todos ####
 Open 2 instances of your browser side by side (your browser should support html5 EventSource). Navigate
 each browser to http://localhost:9080/static/todo.html
 
 Start typing todo items in one of the browser instances.  The todo should be listed and dynamically updated
-in both browser instances.  When you are done editing your todo click the "Submit Task" button.  This will
-allow you to start entering a new task.  
+in both browser instances.  Pressing return/enter will allow you to start entering a new todo.  
 
-Stop the server by pressing Control-c in the terminal you ran go in.
+Stop the server by pressing Control-c in the terminal.
 
