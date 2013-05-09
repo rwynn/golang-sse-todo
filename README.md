@@ -1,7 +1,6 @@
 golang server send events (sse) todo example
 ===============
-This example was inspired by code at https://github.com/kljensen/golang-html5-sse-example. 
-It uses knockout.js and foundation for the UI. The UX is heavily inspired by http://backbonejs.org/docs/todos.html.
+This example was inspired by [golang-html5-sse-example](https://github.com/kljensen/golang-html5-sse-example). It uses [knockout.js](http://knockoutjs.com) and [foundation](http://foundation.zurb.com/) for the UI. The UX is heavily inspired by [backbone todos](http://backbonejs.org/docs/todos.html).
 
 ### Up and Running ###
 
