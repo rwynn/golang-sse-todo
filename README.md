@@ -14,6 +14,10 @@ Install git and the go runtime
 
 Install mongodb.  Packages and instructions for multiple OSes available at http://www.mongodb.org/downloads 
 
+	echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/10gen.list
+	sudo apt-get update
+	sudo apt-get install mongodb-10gen
+
 Install mgo, the mongodb driver for golang
 
 	sudo go get labix.org/v2/mgo
@@ -29,8 +33,8 @@ Start the mongo server if it's not already running
 
 Run the server
 
-	export GOPATH=/path/to/golang-sse-todo
-	cd $GOPATH 
+	cd /path/to/golang-sse-todo
+	export GOPATH=`pwd`
 	go run todo.go
 
 #### Create some Todos ####
