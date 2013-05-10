@@ -1,12 +1,28 @@
 $(document).ready(function() {
-	var evtSource = new EventSource("/todos");
 
 	var ViewController = function() {
 		var self = this;
+		self.evtSource = new EventSource("/todos");
 		self.taskIndex = {};
 		self.task = ko.observable();
 		self.todos = ko.observableArray();
 		self.markAll = ko.observable(false);
+		self.init = function() {
+			self.evtSource.onmessage = self.onmessage;
+			self.addListeners();
+		};
+		self.onmessage = function(e) {
+			if (e.lastEventId == "delete") {
+				self.removeTodo(e.data);	
+			} else if (e.lastEventId == "update") {
+				self.processTodo(JSON.parse(e.data));
+			}
+		};
+		self.removeTodo = function(todoId) {
+			self.todos.remove(function(todo) {
+				return todo.guid == todoId; 
+			});
+		};
 		self.numLeft = ko.computed(function() {
 			var left = 0;
 			$.each(self.todos(), function(index, todo) {
@@ -69,9 +85,16 @@ $(document).ready(function() {
 			}
 		};
 		self.clearTasks = function() {
+			var done = [];
+			$.each(self.todos(), function(index, todo) {
+				if (todo.done()) {
+					done.push(todo.guid);
+				}
+			});
 			$.ajax({
 				type: "DELETE",
 				url: "/todos",
+				data: JSON.stringify(done),
 				success: function() {
 					self.todos.remove(function(todo) {
 						return todo.done();
@@ -125,11 +148,7 @@ $(document).ready(function() {
 	};
 
 	var vc = new ViewController();
-	vc.addListeners();
 	ko.applyBindings(vc);
-
-	evtSource.onmessage = function(e) {
-		vc.processTodo(JSON.parse(e.data));
-	}
+	vc.init();
 
 });

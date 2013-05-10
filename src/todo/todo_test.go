@@ -41,3 +41,19 @@ func TestReadsJsonTodo(t *testing.T) {
 		t.Error("Expecting set property Done")
 	}
 }
+
+func TestReadsTodoIds(t *testing.T) {
+	reader := strings.NewReader(
+		"[\"1\", \"2\", \"3\"]")
+	var todos []string
+	error := ReadJson(reader, &todos)
+	if error != nil {
+		t.Error("Expecting JSON read ok")
+	}
+	if len(todos) != 3 {
+		t.Error("Expecting 3 ids")
+	}
+	if todos[0] != "1" {
+		t.Error("Expecting Read first id")
+	}
+}

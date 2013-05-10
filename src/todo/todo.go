@@ -10,25 +10,30 @@ import "bytes"
 import "log"
 import "strings"
 
+type Message struct {
+	Id string
+	Data string
+}
+
 type Broker struct {
 	// Create a map of clients, the keys of the map are the channels
 	// over which we can push messages to attached clients. (The values
 	// are just booleans and are meaningless.)
 	//
-	clients map[chan string]bool
+	clients map[chan *Message]bool
 
 	// Channel into which new clients can be pushed
 	//
-	newClients chan chan string
+	newClients chan chan *Message
 
 	// Channel into which disconnected clients should be pushed
 	//
-	defunctClients chan chan string
+	defunctClients chan chan *Message
 
 	// Channel into which messages are pushed to be broadcast out
 	// to attahed clients.
 	//
-	messages chan string
+	messages chan *Message
 }
 
 type RequestFunc func(http.ResponseWriter, *http.Request)
@@ -77,6 +82,7 @@ type Todo struct {
 	Guid string `json:"guid"`
 	Done bool `json:"done"`
 }
+
 
 func ReadJson(from io.Reader, to interface{}) error {
 	dec := json.NewDecoder(from)
@@ -129,15 +135,23 @@ func SaveTodo(resp http.ResponseWriter, req *http.Request,
 	} else {
 		collection := TodoCollection(session)
 		collection.Upsert(bson.M{"guid": todo.Guid}, todo)
-		b.messages <- todo.ToJsonString()
+		message := &Message{"update", todo.ToJsonString()}
+		b.messages <- message
 	}
 }
 
 func DeleteTodos(resp http.ResponseWriter, req *http.Request,
 		b *Broker, session *mgo.Session) {
 	defer session.Close()
-	collection := TodoCollection(session)
-	collection.RemoveAll(bson.M{"done": true})
+	var todos []string
+	if ReadJson(req.Body, &todos) == nil {
+		collection := TodoCollection(session)
+		collection.RemoveAll(bson.M{"guid": bson.M{"$in": todos}})
+		for _, todo := range todos {
+			message := &Message{"delete", todo}
+			b.messages <- message
+		}
+	}
 }
 
 func MakeTodoSaver(b *Broker, session *mgo.Session) RequestFunc {
@@ -162,7 +176,7 @@ func ProduceTodos(resp http.ResponseWriter, req *http.Request,
 	}
 	// Create a new channel, over which the broker can
 	// send this client messages.
-	messageChan := make(chan string)
+	messageChan := make(chan *Message)
 	// Add this client to the map of those that should
 	// receive updates
 	b.newClients <- messageChan
@@ -178,12 +192,13 @@ func ProduceTodos(resp http.ResponseWriter, req *http.Request,
 	resp.Header().Set("Connection", "keep-alive")
 	for {
 		msg := <-messageChan
-		fmt.Fprintf(resp, "data: %s\n\n", msg)
+		fmt.Fprintf(resp, "id: %s\n", msg.Id)
+		fmt.Fprintf(resp, "data: %s\n\n", msg.Data)
 		f.Flush()
 	}
 }
 
-func QueueTodos(session *mgo.Session, messageChan chan string) {
+func QueueTodos(session *mgo.Session, messageChan chan *Message ) {
 	var todos []Todo
 	defer session.Close()
 	collection := TodoCollection(session)
@@ -193,7 +208,8 @@ func QueueTodos(session *mgo.Session, messageChan chan string) {
 		return
 	}
 	for _, todo := range todos {
-		messageChan <- todo.ToJsonString()
+		message := &Message{"update", todo.ToJsonString()}
+		messageChan <- message
 	}
 }
 
@@ -261,10 +277,10 @@ func (b *Broker) Start() {
 
 func NewBroker() *Broker {
 	b := &Broker{
-		make(map[chan string]bool),
-		make(chan (chan string)),
-		make(chan (chan string)),
-		make(chan string),
+		make(map[chan *Message]bool),
+		make(chan (chan *Message)),
+		make(chan (chan *Message)),
+		make(chan *Message),
 	}
 	return b;
 }
