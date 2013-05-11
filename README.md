@@ -1,4 +1,4 @@
-golang server send events (sse) todo example
+golang server sent events (sse) todo example
 ===============
 
 This example was inspired by [golang-html5-sse-example](https://github.com/kljensen/golang-html5-sse-example). It uses [knockout.js](http://knockoutjs.com) and [foundation](http://foundation.zurb.com/) for the UI. The UX is heavily inspired by [backbone todos](http://backbonejs.org/docs/todos.html).
@@ -8,9 +8,15 @@ This example was inspired by [golang-html5-sse-example](https://github.com/kljen
 ### Up and Running ###
 
 #### Install Dependencies ####
-Install git and the go runtime
+Install golang version 1.1 or above (unfortunately, 1.0 does not include http.CloseNotifier which is used here)
 
-	sudo apt-get install git golang
+	sudo add-apt-repository ppa:gophers/go
+	sudo apt-get update
+	sudo apt-get install golang-tip
+
+Install git 
+
+	sudo apt-get install git
 
 Install mongodb.  Packages and instructions for multiple OSes available at http://www.mongodb.org/downloads 
 
@@ -20,7 +26,9 @@ Install mongodb.  Packages and instructions for multiple OSes available at http:
 
 Install mgo, the mongodb driver for golang
 
-	sudo go get labix.org/v2/mgo
+	mkdir -p ~/Go/vendor
+	export GOPATH=~/Go/vendor
+	go get labix.org/v2/mgo
 
 Clone this repository to your local filesystem
 
@@ -31,10 +39,10 @@ Start the mongo server if it's not already running
 
 	sudo mongod -f /etc/mongodb.conf
 
-Run the server
+Run the server (assumes that $GOPATH already includes ~/Go/vendor to find mgo)
 
 	cd /path/to/golang-sse-todo
-	export GOPATH=`pwd`
+	export GOPATH=$GOPATH:`pwd`
 	go run todo.go
 
 #### Create some Todos ####

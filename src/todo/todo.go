@@ -11,7 +11,7 @@ import "log"
 import "strings"
 
 type Message struct {
-	Id string
+	Id   string
 	Data string
 }
 
@@ -72,17 +72,16 @@ func (this *Handler) Execute(resp http.ResponseWriter, req *http.Request) {
 }
 
 type RestConfig struct {
-	Get RequestFunc
-	Post RequestFunc
+	Get    RequestFunc
+	Post   RequestFunc
 	Delete RequestFunc
 }
 
 type Todo struct {
 	Task string `json:"task"`
 	Guid string `json:"guid"`
-	Done bool `json:"done"`
+	Done bool   `json:"done"`
 }
-
 
 func ReadJson(from io.Reader, to interface{}) error {
 	dec := json.NewDecoder(from)
@@ -127,7 +126,7 @@ func InitSession(session *mgo.Session) {
 }
 
 func SaveTodo(resp http.ResponseWriter, req *http.Request,
-		b *Broker, session *mgo.Session) {
+	b *Broker, session *mgo.Session) {
 	defer session.Close()
 	var todo = new(Todo)
 	if err := todo.ReadJson(req.Body); err != nil {
@@ -141,7 +140,7 @@ func SaveTodo(resp http.ResponseWriter, req *http.Request,
 }
 
 func DeleteTodos(resp http.ResponseWriter, req *http.Request,
-		b *Broker, session *mgo.Session) {
+	b *Broker, session *mgo.Session) {
 	defer session.Close()
 	var todos []string
 	if ReadJson(req.Body, &todos) == nil {
@@ -167,11 +166,16 @@ func MakeTodosDeleter(b *Broker, session *mgo.Session) RequestFunc {
 }
 
 func ProduceTodos(resp http.ResponseWriter, req *http.Request,
-		b *Broker, session *mgo.Session) {
+	b *Broker, session *mgo.Session) {
 	f, ok := resp.(http.Flusher)
 	if !ok {
 		http.Error(resp, "Streaming unsupported!",
 			http.StatusInternalServerError)
+		return
+	}
+	c, ok := resp.(http.CloseNotifier)
+	if !ok {
+		http.Error(resp, "close notification unsupported", http.StatusInternalServerError)
 		return
 	}
 	// Create a new channel, over which the broker can
@@ -187,18 +191,25 @@ func ProduceTodos(resp http.ResponseWriter, req *http.Request,
 	defer func() {
 		b.defunctClients <- messageChan
 	}()
-	resp.Header().Set("Content-Type", "text/event-stream")
-	resp.Header().Set("Cache-Control", "no-cache")
-	resp.Header().Set("Connection", "keep-alive")
+	headers := resp.Header()
+	headers.Set("Content-Type", "text/event-stream")
+	headers.Set("Cache-Control", "no-cache")
+	headers.Set("Connection", "keep-alive")
+	closer := c.CloseNotify()
 	for {
-		msg := <-messageChan
-		fmt.Fprintf(resp, "id: %s\n", msg.Id)
-		fmt.Fprintf(resp, "data: %s\n\n", msg.Data)
-		f.Flush()
+		select {
+		case msg := <-messageChan:
+			fmt.Fprintf(resp, "id: %s\n", msg.Id)
+			fmt.Fprintf(resp, "data: %s\n\n", msg.Data)
+			f.Flush()
+		case <-closer:
+			log.Println("Closing connection")
+			return
+		}
 	}
 }
 
-func QueueTodos(session *mgo.Session, messageChan chan *Message ) {
+func QueueTodos(session *mgo.Session, messageChan chan *Message) {
 	var todos []Todo
 	defer session.Close()
 	collection := TodoCollection(session)
@@ -282,7 +293,7 @@ func NewBroker() *Broker {
 		make(chan (chan *Message)),
 		make(chan *Message),
 	}
-	return b;
+	return b
 }
 
 func AddRestEndpoint(broker *Broker, session *mgo.Session) {
@@ -290,7 +301,7 @@ func AddRestEndpoint(broker *Broker, session *mgo.Session) {
 	saveTodo.Body = MakeTodoSaver(broker, session)
 	saveTodo.Check = WasJson
 
-	config := new (RestConfig)
+	config := new(RestConfig)
 	config.Get = MakeTodoProducer(broker, session)
 	config.Post = HandlerFunc(saveTodo)
 	config.Delete = MakeTodosDeleter(broker, session)
