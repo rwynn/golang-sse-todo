@@ -23,7 +23,10 @@
 			<ul data-bind="foreach:todos" class="no-bullet">
 				<li class="todo-item" data-bind="css:{done:done}">
 					<input type="checkbox" data-bind="checked:done, click:$root.markDone"/>
-					<span data-bind="text:task"/>	
+					<span data-bind="text:task, click:$root.doEdit, ifnot:editing"></span>
+					<span data-bind="if:editing">	
+						<input type="text" data-bind="value:task"/>
+					</span>
 				</li>
 			</ul>
 		</div>

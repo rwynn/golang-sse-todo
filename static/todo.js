@@ -61,6 +61,10 @@ $(document).ready(function() {
 			}
 			return true;
 		};
+		self.doEdit = function() {
+			this.editing(true);
+			return true;
+		};	
 		self.markDone = function() {
 			self.markAll(self.allDone());
 			self.remoteUpdate(
@@ -77,11 +81,22 @@ $(document).ready(function() {
 				self.taskIndex[todo.guid].done(todo.done);
 			} 
 			else {
-				self.taskIndex[todo.guid] = {
+				var newTodo = {
+					"editing": ko.observable(false),
 					"task" : ko.observable(todo.task),
 					"done" : ko.observable(todo.done),
-					"guid" : todo.guid }
-				self.todos.push(self.taskIndex[todo.guid]);
+					"guid" : todo.guid };
+				newTodo.task.subscribe(function(taskVal) {
+					newTodo.editing(false);
+					self.remoteUpdate(
+						{	task: taskVal, 
+							guid: newTodo.guid, 
+							done: newTodo.done()
+						}
+					);
+				});
+				self.taskIndex[todo.guid] = newTodo;
+				self.todos.push(newTodo);
 			}
 		};
 		self.clearTasks = function() {
@@ -127,10 +142,10 @@ $(document).ready(function() {
 			self.task("");
 		}
 		self.genGuid = function() {
-			return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, 
-				function(c) {
-						var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
-						return v.toString(16);
+			var pat = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+			return pat.replace(/[xy]/g, function(c) {
+				var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+				return v.toString(16);
 			});
 		}
 		self.guid = ko.observable(self.genGuid());
