@@ -175,7 +175,8 @@ func ProduceTodos(resp http.ResponseWriter, req *http.Request,
 	}
 	c, ok := resp.(http.CloseNotifier)
 	if !ok {
-		http.Error(resp, "close notification unsupported", http.StatusInternalServerError)
+		http.Error(resp, "close notification unsupported",
+			http.StatusInternalServerError)
 		return
 	}
 	// Create a new channel, over which the broker can
