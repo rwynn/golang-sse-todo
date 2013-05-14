@@ -233,13 +233,13 @@ func MakeTodoProducer(b *Broker, session *mgo.Session) RequestFunc {
 
 func MakeRestEndpoint(config *RestConfig) RequestFunc {
 	return func(resp http.ResponseWriter, req *http.Request) {
-		if req.Method == "GET" {
+		if req.Method == "GET" && config.Get != nil {
 			config.Get(resp, req)
 			return
-		} else if req.Method == "POST" {
+		} else if req.Method == "POST" && config.Post != nil {
 			config.Post(resp, req)
 			return
-		} else if req.Method == "DELETE" {
+		} else if req.Method == "DELETE" && config.Delete != nil {
 			config.Delete(resp, req)
 			return
 		} else {
