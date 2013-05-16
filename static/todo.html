@@ -22,10 +22,13 @@
 					Mark all as complete</label>
 			<ul data-bind="foreach:todos" class="no-bullet">
 				<li class="todo-item" data-bind="css:{done:done}">
-					<input type="checkbox" data-bind="checked:done, click:$root.markDone"/>
-					<span data-bind="text:task, click:$root.doEdit, ifnot:editing"></span>
+					<span data-bind="ifnot:editing">	
+						<input type="checkbox" data-bind="checked:done, click:$root.markDone"/>
+						<span data-bind="text:task,event:{dblclick:$root.doEdit}"></span>
+					</span>
 					<span data-bind="if:editing">	
-						<input type="text" data-bind="value:task"/>
+						<input type="text" 
+							data-bind="hasfocus:editing,value:task,event:{blur:$root.stopEditing}"/>
 					</span>
 				</li>
 			</ul>
@@ -45,6 +48,11 @@
 						data-bind="visible:someDone,click:clearTasks">Clear Completed</button>
 				</div>
 			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="instructions seven columns offset-by-two">
+			<p>Double-click todo item to edit it</p>
 		</div>
 	</div>
 </body>

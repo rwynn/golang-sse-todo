@@ -4,10 +4,12 @@ body {
 }
 .container { background: white; padding: 20px; }
 .todo-item { font-size:24px; font-weight:bold; }
-.todo-item input[type=text] { width:400px; display: inline}
+.todo-item input[type=text] { display: inline}
 .numLeft { font-weight:bold; }
 .done { text-decoration:line-through; }
-.footer { padding: 4px; background: none repeat scroll 0% 0% rgb(244, 252, 232); }
+.footer { padding: 10px; background: none repeat scroll 0% 0% rgb(244, 252, 232); }
+.instructions { padding:20; margin-top: 20px; }
+.instructions p { text-align:center; }
 
 input[type="text"] {
 	width: 466px;

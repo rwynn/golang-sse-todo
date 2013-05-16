@@ -53,20 +53,21 @@ $(document).ready(function() {
 			return someDone;	
 		});
 		self.markAllTasks = function() {
-			if (self.markAll()) {
-				$.each(self.todos(), function(index, todo) {
-					todo.done(true);
-					self.markDone.call(todo);
-				});
-			}
+			$.each(self.todos(), function(index, todo) {
+				todo.done(self.markAll());
+				self.markDone.call(todo);
+			});
 			return true;
 		};
 		self.doEdit = function() {
 			this.editing(true);
 			return true;
-		};	
+		};
+		self.stopEditing = function() {
+			this.editing(false);	
+			return true;
+		};
 		self.markDone = function() {
-			self.markAll(self.allDone());
 			self.remoteUpdate(
 			{
 				"task" : this.task(),
@@ -98,6 +99,7 @@ $(document).ready(function() {
 				self.taskIndex[todo.guid] = newTodo;
 				self.todos.push(newTodo);
 			}
+			self.markAll(self.allDone());
 		};
 		self.clearTasks = function() {
 			var done = [];
