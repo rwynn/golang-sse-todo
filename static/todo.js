@@ -63,8 +63,18 @@ $(document).ready(function() {
 			this.editing(true);
 			return true;
 		};
+		self.todoChanged = function() {
+			self.remoteUpdate(
+				{	task: this.task(), 
+					guid: this.guid, 
+					done: this.done()
+				}
+			);
+			this.editing(false);
+			return true;
+		};
 		self.stopEditing = function() {
-			this.editing(false);	
+			this.editing(false);
 			return true;
 		};
 		self.markDone = function() {
@@ -80,22 +90,13 @@ $(document).ready(function() {
 			if (todo.guid in self.taskIndex) {
 				self.taskIndex[todo.guid].task(todo.task);
 				self.taskIndex[todo.guid].done(todo.done);
-			} 
-			else {
+			} else {
 				var newTodo = {
 					"editing": ko.observable(false),
 					"task" : ko.observable(todo.task),
 					"done" : ko.observable(todo.done),
-					"guid" : todo.guid };
-				newTodo.task.subscribe(function(taskVal) {
-					newTodo.editing(false);
-					self.remoteUpdate(
-						{	task: taskVal, 
-							guid: newTodo.guid, 
-							done: newTodo.done()
-						}
-					);
-				});
+					"guid" : todo.guid 
+				};
 				self.taskIndex[todo.guid] = newTodo;
 				self.todos.push(newTodo);
 			}

@@ -28,7 +28,7 @@
 					</span>
 					<span data-bind="if:editing">	
 						<input type="text" 
-							data-bind="hasfocus:editing,value:task,event:{blur:$root.stopEditing}"/>
+						data-bind="value:task,event:{change:$root.todoChanged,blur:$root.stopEditing},hasfocus:editing"/>
 					</span>
 				</li>
 			</ul>
@@ -52,7 +52,7 @@
 	</div>
 	<div class="row">
 		<div class="instructions seven columns offset-by-two">
-			<p>Double-click todo item to edit it</p>
+			<p>Double-click a todo to edit it</p>
 		</div>
 	</div>
 </body>
