@@ -20,8 +20,9 @@ $(document).ready(function() {
 		};
 		self.removeTodo = function(todoId) {
 			self.todos.remove(function(todo) {
-				return todo.guid == todoId; 
+				return todo.guid == todoId;
 			});
+			delete self.taskIndex[todoId];
 		};
 		self.numLeft = ko.computed(function() {
 			var left = 0;
@@ -112,12 +113,7 @@ $(document).ready(function() {
 			$.ajax({
 				type: "DELETE",
 				url: "/todos",
-				data: JSON.stringify(done),
-				success: function() {
-					self.todos.remove(function(todo) {
-						return todo.done();
-					});	
-				}
+				data: JSON.stringify(done)
 			});
 		};
 		self.remoteUpdate = function(data, success) {
@@ -136,7 +132,7 @@ $(document).ready(function() {
 			self.remoteUpdate(
 				{	task: val, 
 					guid: self.guid(), 
-					done: false
+					done: false,
 				}, success
 			);
 		};
