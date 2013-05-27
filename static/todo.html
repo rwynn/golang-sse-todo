@@ -45,7 +45,10 @@
 				</div>
 				<div class="four columns">
 					<button class="button small" 
-						data-bind="visible:someDone,click:clearTasks">Clear Completed</button>
+						data-bind="visible:someDone,click:clearTasks">
+						Clear <span data-bind="text:numDone"></span>
+						Completed
+					</button>
 				</div>
 			</div>
 		</div>

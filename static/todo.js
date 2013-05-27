@@ -17,6 +17,7 @@ $(document).ready(function() {
 			} else if (e.lastEventId == "update") {
 				self.processTodo(JSON.parse(e.data));
 			}
+			self.markAll(self.allDone());
 		};
 		self.removeTodo = function(todoId) {
 			self.todos.remove(function(todo) {
@@ -33,25 +34,14 @@ $(document).ready(function() {
 			});
 			return left;
 		});	
+		self.numDone = ko.computed(function() {
+			return self.todos().length - self.numLeft();
+		});
 		self.allDone = ko.computed(function() {
-			var allDone = true;
-			$.each(self.todos(), function(index, todo) {
-				if (todo.done() == false) {
-					allDone = false;
-					return false;
-				}
-			});
-			return allDone;	
+			return self.numLeft() == 0;	
 		});
 		self.someDone = ko.computed(function() {
-			var someDone = false;
-			$.each(self.todos(), function(index, todo) {
-				if (todo.done()) {
-					someDone = true;
-					return false;
-				}
-			});
-			return someDone;	
+			return self.numDone() > 0;	
 		});
 		self.markAllTasks = function() {
 			$.each(self.todos(), function(index, todo) {
@@ -101,7 +91,6 @@ $(document).ready(function() {
 				self.taskIndex[todo.guid] = newTodo;
 				self.todos.push(newTodo);
 			}
-			self.markAll(self.allDone());
 		};
 		self.clearTasks = function() {
 			var done = [];
