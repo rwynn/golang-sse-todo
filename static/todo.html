@@ -16,7 +16,7 @@
 	<div class="row">
 		<div class="container seven columns offset-by-two">
 			<h2>Todos</h2>
-			<input id="task" type="text" data-bind="value:task" placeholder="What needs to be done?"/>
+			<input id="new-todo" type="text" data-bind="value:task" placeholder="What needs to be done?"/>
 			<label data-bind="if:todos().length > 0"><input type="checkbox" 
 					data-bind="checked:markAll, click:markAllTasks"/> 
 					Mark all as complete</label>
@@ -26,9 +26,8 @@
 						<input type="checkbox" data-bind="checked:done, click:$root.markDone"/>
 						<span data-bind="text:task,event:{dblclick:$root.doEdit}"></span>
 					</span>
-					<span data-bind="if:editing">	
-						<input type="text" 
-						data-bind="value:task,event:{change:$root.todoChanged,blur:$root.stopEditing},hasfocus:editing"/>
+					<span data-bind="if:editing">
+						<input type="text" data-bind="value:task,event:{change:$root.todoChanged,blur:$root.stopEditing},hasfocus:editing"/>
 					</span>
 				</li>
 			</ul>

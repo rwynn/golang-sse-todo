@@ -7,10 +7,37 @@ $(document).ready(function() {
 		self.task = ko.observable();
 		self.todos = ko.observableArray();
 		self.markAll = ko.observable(false);
+		self.view = ko.observable();
 		self.init = function() {
 			self.evtSource.onmessage = self.onmessage;
 			self.addListeners();
 		};
+		self.doView = function() {
+			self.view(location.hash);
+		};
+		self.viewingActive = ko.computed(function() {
+			return self.view() == "#/active";
+		});
+		self.viewingCompleted = ko.computed(function() {
+			return self.view() == "#/completed";
+		});
+		self.viewingAll = ko.computed(function() {
+			return self.viewingActive() == false 
+				&& self.viewingCompleted() == false;	
+		});
+		self.todosView = ko.computed(function() {
+			if (self.view() == "#/active") {
+				return ko.utils.arrayFilter(self.todos(), function(todo) {
+					return todo.done() == false;
+				});
+			} else if (self.view() == "#/completed") {
+				return ko.utils.arrayFilter(self.todos(), function(todo) {
+					return todo.done();
+				});
+			} else {
+				return self.todos();
+			}
+		});
 		self.onmessage = function(e) {
 			if (e.lastEventId == "delete") {
 				self.removeTodo(e.data);	
@@ -25,6 +52,9 @@ $(document).ready(function() {
 			});
 			delete self.taskIndex[todoId];
 		};
+		self.hasTodos = ko.computed(function() {
+			return self.todos().length > 0;
+		});
 		self.numLeft = ko.computed(function() {
 			var left = 0;
 			$.each(self.todos(), function(index, todo) {
@@ -38,7 +68,7 @@ $(document).ready(function() {
 			return self.todos().length - self.numLeft();
 		});
 		self.allDone = ko.computed(function() {
-			return self.numLeft() == 0;	
+			return self.hasTodos() && self.numLeft() == 0;	
 		});
 		self.someDone = ko.computed(function() {
 			return self.numDone() > 0;	
@@ -92,6 +122,9 @@ $(document).ready(function() {
 				self.todos.push(newTodo);
 			}
 		};
+		self.cancelTask = function() {
+			self.deleteSome([this.guid]);
+		};
 		self.clearTasks = function() {
 			var done = [];
 			$.each(self.todos(), function(index, todo) {
@@ -99,10 +132,13 @@ $(document).ready(function() {
 					done.push(todo.guid);
 				}
 			});
+			self.deleteSome(done);
+		};
+		self.deleteSome = function(some) {
 			$.ajax({
 				type: "DELETE",
 				url: "/todos",
-				data: JSON.stringify(done)
+				data: JSON.stringify(some)
 			});
 		};
 		self.remoteUpdate = function(data, success) {
@@ -139,7 +175,7 @@ $(document).ready(function() {
 		self.guid = ko.observable(self.genGuid());
 
 		self.addListeners = function() {
-			$("#task").keyup(function() { 
+			$("#new-todo").keyup(function() { 
 				self.updateTask($(this).val()); 
 			}).keypress(function(e) {
 				if (e.keyCode == 13) {
@@ -147,6 +183,7 @@ $(document).ready(function() {
 					function() { self.completeTask()});
 				}
 			});
+			window.onhashchange = self.doView;
 		};
 	};
 
