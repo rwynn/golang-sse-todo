@@ -13,7 +13,7 @@
 				<input id="new-todo" data-bind="value:task" placeholder="What needs to be done?" autofocus>
 			</header>
 			<!-- This section should be hidden by default and shown when there are todos -->
-			<section id="main">
+			<section id="main" data-bind="if:hasTodos">
 				<input id="toggle-all" type="checkbox" data-bind="checked:markAll, click:markAllTasks">
 				<label for="toggle-all">Mark all as complete</label>
 				<ul id="todo-list" data-bind="foreach:todosView">

@@ -1,5 +1,4 @@
 $(document).ready(function() {
-
 	var ViewController = function() {
 		var self = this;
 		self.evtSource = new EventSource("/todos");
@@ -123,7 +122,7 @@ $(document).ready(function() {
 			}
 		};
 		self.cancelTask = function() {
-			self.deleteSome([this.guid]);
+			self.remoteDelete([this.guid]);
 		};
 		self.clearTasks = function() {
 			var done = [];
@@ -132,13 +131,13 @@ $(document).ready(function() {
 					done.push(todo.guid);
 				}
 			});
-			self.deleteSome(done);
+			self.remoteDelete(done);
 		};
-		self.deleteSome = function(some) {
+		self.remoteDelete = function(data) {
 			$.ajax({
 				type: "DELETE",
 				url: "/todos",
-				data: JSON.stringify(some)
+				data: JSON.stringify(data)
 			});
 		};
 		self.remoteUpdate = function(data, success) {
@@ -173,7 +172,6 @@ $(document).ready(function() {
 			});
 		}
 		self.guid = ko.observable(self.genGuid());
-
 		self.addListeners = function() {
 			$("#new-todo").keyup(function() { 
 				self.updateTask($(this).val()); 
@@ -186,9 +184,7 @@ $(document).ready(function() {
 			window.onhashchange = self.doView;
 		};
 	};
-
 	var vc = new ViewController();
 	ko.applyBindings(vc);
 	vc.init();
-
 });
