@@ -256,10 +256,8 @@ func HandlerFunc(h *Handler) RequestFunc {
 
 func (b *Broker) Start() {
 	// Start a goroutine
-	//
 	go func() {
 		// Loop endlessly
-		//
 		for {
 			// Block until we receive from one of the
 			// three following channels.
