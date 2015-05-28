@@ -1,8 +1,8 @@
 package todo
 
 import "net/http"
-import "labix.org/v2/mgo"
-import "labix.org/v2/mgo/bson"
+import "gopkg.in/mgo.v2"
+import "gopkg.in/mgo.v2/bson"
 import "io"
 import "encoding/json"
 import "fmt"

@@ -3,18 +3,18 @@ package main
 import "net/http"
 import "todo"
 import "log"
-import "labix.org/v2/mgo"
+import "gopkg.in/mgo.v2"
 import "os"
 import "strings"
 
 func main() {
-	// parse last path on GOPATH 
+	// parse last path on GOPATH
 	gopath := os.Getenv("GOPATH")
 	if gopath == "" {
 		panic("unable to read go path from env")
 	}
 	pathParts := strings.Split(gopath, ":")
-	lastPart := pathParts[len(pathParts) - 1]
+	lastPart := pathParts[len(pathParts)-1]
 	// connect to mongo
 	session, err := mgo.Dial("localhost")
 	if err != nil {
