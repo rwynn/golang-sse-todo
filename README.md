@@ -8,27 +8,20 @@ This example was inspired by [golang-html5-sse-example](https://github.com/kljen
 ### Up and Running ###
 
 #### Install Dependencies ####
-Install golang version 1.1 or above (unfortunately, 1.0 does not include http.CloseNotifier which is used here)
 
-	sudo add-apt-repository ppa:gophers/go
-	sudo apt-get update
-	sudo apt-get install golang-tip
+Install [golang](http://golang.org/doc/install)
 
-Install git 
+Install git and bazaar
 
-	sudo apt-get install git
+	sudo apt-get install git bzr
 
-Install mongodb.  Packages and instructions for multiple OSes available at http://www.mongodb.org/downloads 
+Install [mongodb](http://www.mongodb.org/downloads)
 
-	echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/10gen.list
-	sudo apt-get update
-	sudo apt-get install mongodb-10gen
-
-Install mgo, the mongodb driver for golang
+Install [mgo](https://labix.org/mgo), the mongodb driver for golang
 
 	mkdir -p ~/Go/vendor
 	export GOPATH=~/Go/vendor
-	go get labix.org/v2/mgo
+	go get gopkg.in/mgo.v2
 
 Clone this repository to your local filesystem
 
